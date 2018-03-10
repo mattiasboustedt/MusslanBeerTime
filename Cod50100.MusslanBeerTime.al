@@ -47,7 +47,7 @@ codeunit 50100 MusslanBeerTime
         HoursToNanoRatio: Decimal;
     begin
         HoursToNanoRatio := 0.000000000000277778;
-        HoursToBeerTIme := HoursToNanoRatio * NanoToBeerTime;
+        HoursToBeerTime := HoursToNanoRatio * NanoToBeerTime;
         HoursToBeerTime := Round(HoursToBeerTime);
     end;
 
