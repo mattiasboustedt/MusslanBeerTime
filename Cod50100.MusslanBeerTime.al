@@ -42,20 +42,20 @@ codeunit 50100 MusslanBeerTime
         NanoToBeerTime := GetJsonToken(BeerObject, 'nanoToBeerTime').AsValue.AsBigInteger;
     end;
 
-    local procedure ConvertNanoToHours(NanoToBeerTime: BigInteger) HoursToBeerTime: BigInteger
+    local procedure ConvertNanoToHours(NanoToBeerTime: BigInteger) HoursToBeerTime: Decimal
     var
         HoursToNanoRatio: Decimal;
-
     begin
         HoursToNanoRatio := 0.000000000000277778;
-        HoursToBeerTime := HoursToNanoRatio * NanoToBeerTime;
+        HoursToBeerTIme := HoursToNanoRatio * NanoToBeerTime;
+        HoursToBeerTime := Round(HoursToBeerTime);
     end;
 
     local procedure AlertUserOfBeerTime(MusslanBeerTime: Boolean; NanoToBeerTime: BigInteger) Success: Boolean
     var
         UserNotification: Notification;
         BeerMessage: Text;
-        HoursToBeerTime: BigInteger;
+        HoursToBeerTime: Decimal;
     begin
         HoursToBeerTime := ConvertNanoToHours(NanoToBeerTime);
 
