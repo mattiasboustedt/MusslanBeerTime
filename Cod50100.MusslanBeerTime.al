@@ -4,44 +4,44 @@ codeunit 50100 MusslanBeerTime
     begin
         GetMusslanBeerTime();
     end;
-
+    
     local procedure GetMusslanBeerTime();
     var
         HttpClient: HttpClient;
         Response: HttpResponseMessage;
         BeerObject: JsonObject;
         BeerToken: JsonToken;
-        BeerText: text;
-        MusslanBeerTime: Boolean;
         NanoToBeerTime: BigInteger;
+        MusslanBeerTime: Boolean;
+        BeerText: Text;
     begin
-        if not HttpClient.Get('https://api.isitmusslanbeertime.com/time', Response) then
-            error('Call to WS failed.');
-
+        if not HttpClient.Get('https://api.isitmusslanbeertime.com/time',Response) then
+            Error('Call to WS failed.');
+            
         if not Response.IsSuccessStatusCode then
             Error('Error:  %1\ Statuscode: %2',
                     Response.ReasonPhrase,
-                    FORMAT(Response.HttpStatusCode));
-
+                    Format(Response.HttpStatusCode));
+                    
         Response.Content.ReadAs(BeerText);
         BeerObject.ReadFrom(BeerText);
-
+        
         MusslanBeerTime := IsItMusslanBeerTime(BeerObject);
         NanoToBeerTime := GetNanoToBeerTime(BeerObject);
-
-        AlertUserOfBeerTime(MusslanBeerTime, NanoToBeerTime);
+        
+        AlertUserOfBeerTime(MusslanBeerTime,NanoToBeerTime);
     end;
-
+    
     local procedure IsItMusslanBeerTime(BeerObject: JsonObject) MusslanBeerTime: Boolean;
     begin
-        MusslanBeerTime := GetJsonToken(BeerObject, 'currentBeerTime').AsValue.AsBoolean;
+        MusslanBeerTime := GetJsonToken(BeerObject,'currentBeerTime').AsValue.AsBoolean;
     end;
-
+    
     local procedure GetNanoToBeerTime(BeerObject: JsonObject) NanoToBeerTime: BigInteger;
     begin
-        NanoToBeerTime := GetJsonToken(BeerObject, 'nanoToBeerTime').AsValue.AsBigInteger;
+        NanoToBeerTime := GetJsonToken(BeerObject,'nanoToBeerTime').AsValue.AsBigInteger;
     end;
-
+    
     local procedure ConvertNanoToHours(NanoToBeerTime: BigInteger) HoursToBeerTime: Decimal
     var
         HoursToNanoRatio: Decimal;
@@ -50,30 +50,36 @@ codeunit 50100 MusslanBeerTime
         HoursToBeerTime := HoursToNanoRatio * NanoToBeerTime;
         HoursToBeerTime := Round(HoursToBeerTime);
     end;
-
+    
     local procedure AlertUserOfBeerTime(MusslanBeerTime: Boolean; NanoToBeerTime: BigInteger) Success: Boolean
     var
-        UserNotification: Notification;
-        BeerMessage: Text;
         HoursToBeerTime: Decimal;
+        BeerMessage: Text;
     begin
         HoursToBeerTime := ConvertNanoToHours(NanoToBeerTime);
-
-        if MusslanBeerTime = TRUE then
+        
+        if MusslanBeerTime = true then
             BeerMessage := 'It is Musslan Beer Time. Let us celebrate.'
         else
             BeerMessage := 'Unfortunately, it is not Musslan Beer Time.'
-                            + ' Nano To Beer Time: ' + FORMAT(NanoToBeerTime) + '.'
-                            + ' Hours To Beer Time: ' + FORMAT(HoursToBeerTime) + '.';
-
-        UserNotification.Message(BeerMessage);
-        UserNotification.Send;
+            + ' Nano To Beer Time: ' + Format(NanoToBeerTime) + '.'
+            + ' Hours To Beer Time: ' + Format(HoursToBeerTime) + '.';
+            
+        Message(BeerMessage);
     end;
-
-    local procedure GetJsonToken(BeerObject: JsonObject; TokenKey: text) JsonToken: JsonToken;
+    
+    local procedure GetJsonToken(BeerObject: JsonObject; TokenKey: Text) JsonToken: JsonToken;
     begin
-        if not BeerObject.Get(TokenKey, JsonToken) then
-            Error('Could not find a token with key %1', TokenKey);
+        if not BeerObject.Get(TokenKey,JsonToken) then
+            Error('Could not find a token with key %1',TokenKey);
     end;
-
+    
+    [EventSubscriber(ObjectType::Codeunit,1,'OnAfterCompanyOpen','',false,false)]
+    local procedure SendUserNotificationOnAfterCompanyOpen();
+    var
+        MusslanBeerTime: Codeunit MusslanBeerTime;
+    begin
+        MusslanBeerTime.Run;
+    end;
+    
 }
