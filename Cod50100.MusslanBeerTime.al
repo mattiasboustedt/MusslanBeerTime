@@ -59,7 +59,7 @@ codeunit 50100 MusslanBeerTime
         HoursToBeerTime := ConvertNanoToHours(NanoToBeerTime);
         
         if MusslanBeerTime = true then
-            BeerMessage := 'It is Musslan Beer Time. Let us celebrate.'
+            BeerMessage := 'It is Musslan Beer Time! Please stop whatever you are doing and grab a beer.'
         else
             BeerMessage := 'Unfortunately, it is not Musslan Beer Time.'
             + ' Nano To Beer Time: ' + Format(NanoToBeerTime) + '.'
